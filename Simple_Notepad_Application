@@ -1,0 +1,86 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+public class NotepadApp extends JFrame implements ActionListener {
+    JTextArea textArea;
+    JMenuItem openItem, saveItem, clearItem, exitItem;
+
+    public NotepadApp() {
+        setTitle("Simple Notepad");
+        setSize(600, 500);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        textArea = new JTextArea();
+        JScrollPane scroll = new JScrollPane(textArea);
+        add(scroll);
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+
+        openItem = new JMenuItem("Open");
+        saveItem = new JMenuItem("Save");
+        clearItem = new JMenuItem("Clear");
+        exitItem = new JMenuItem("Exit");
+
+        openItem.addActionListener(this);
+        saveItem.addActionListener(this);
+        clearItem.addActionListener(this);
+        exitItem.addActionListener(this);
+
+        fileMenu.add(openItem);
+        fileMenu.add(saveItem);
+        fileMenu.add(clearItem);
+        fileMenu.add(exitItem);
+
+        menuBar.add(fileMenu);
+        setJMenuBar(menuBar);
+
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == openItem) {
+            JFileChooser fc = new JFileChooser();
+            int i = fc.showOpenDialog(this);
+            if (i == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(file));
+                    textArea.setText("");
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        textArea.append(line + "\n");
+                    }
+                    reader.close();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "File Error");
+                }
+            }
+        } else if (e.getSource() == saveItem) {
+            JFileChooser fc = new JFileChooser();
+            int i = fc.showSaveDialog(this);
+            if (i == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                try {
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                    writer.write(textArea.getText());
+                    writer.close();
+                    JOptionPane.showMessageDialog(this, "File Saved");
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Save Error");
+                }
+            }
+        } else if (e.getSource() == clearItem) {
+            textArea.setText("");
+        } else if (e.getSource() == exitItem) {
+            System.exit(0);
+        }
+    }
+
+    public static void main(String[] args) {
+        new NotepadApp();
+    }
+}
